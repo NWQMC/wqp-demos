@@ -22,7 +22,7 @@
 var map = L.map('map');
 L.esri.basemapLayer("Topographic").addTo(map);
   L.esri.tiledMapLayer({
-    url: "http://hydrology.esri.com/arcgis/rest/services/WorldHydroReferenceOverlay/MapServer"
+    url: "https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Esri_Hydro_Reference_Overlay/MapServer"
   }).addTo(map);
 map.setView([35.9908385, -78.9005222], 3);
 
