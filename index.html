@@ -1,0 +1,70 @@
+<html>
+<head>
+    <title>Sites in Denver County that have at least one sampling activity</title>
+<!-- Load Leaflet from CDN-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/leaflet/1.0.1/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/leaflet/1.0.1/leaflet.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-providers/1.1.7/leaflet-providers.min.js"></script>
+<!-- Load Esri Leaflet from CDN -->
+  <script src="https://cdn.jsdelivr.net/leaflet.esri/2.0.0-beta.8/esri-leaflet.js"></script>
+</head>
+<body>
+
+
+	<h1>Streams_activities</h1>
+	<p>Sites in dane county that have at least 20 results, scaled by number of sampling activities</p>
+<div id="map" style="width: 100%; height: 800px;"></div>
+
+
+
+<script type="text/javascript">
+var map = L.map('map');
+L.esri.basemapLayer("Topographic").addTo(map);
+  L.esri.tiledMapLayer({
+    url: "http://hydrology.esri.com/arcgis/rest/services/WorldHydroReferenceOverlay/MapServer"
+  }).addTo(map);
+map.setView([35.9908385, -78.9005222], 3);
+
+function onEachPointFeature(feature, layer) {
+            var popupText = "Data Source: " + "WQP"
+                + "<br>Station Name: " + feature.properties.MonitoringLocationName
+                + "<br>Station ID: " + feature.properties.MonitoringLocationIdentifier
+                + "<br>Station Org Name: " + feature.properties.OrganizationFormalName
+                + "<br>Station Data: " + "<a href="+feature.properties.siteUrl+">More data</a>"
+                + "<br>Station Activity Count: " + feature.properties.activityCount
+	    	+ "<br>Station Result Count: " + feature.properties.resultCount;
+            layer.bindPopup(popupText);
+            }
+
+function addPointDataToMap(data, map) {
+    var pointLayer = L.geoJson(data, {
+        onEachFeature: onEachPointFeature,
+        pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, {
+    radius: Math.sqrt(feature.properties.activityCount/Math.PI),
+    //radius: 5,
+    fillColor: "#ff7800",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+});
+        }
+        });
+    pointLayer.addTo(map);
+    map.fitBounds(L.geoJson(data).getBounds());
+}
+
+
+$.getJSON("https://www.waterqualitydata.us/data/Station/search?statecode=US%3A08&countycode=US%3A08%3A031&minactivities=1&mimeType=geojson&zip=no", callbackFuncWithData);
+
+function callbackFuncWithData(data)
+{
+addPointDataToMap(data, map)
+}
+
+
+</script>
+</body>
+</html>
